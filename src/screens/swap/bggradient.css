@@ -1,0 +1,152 @@
+#screenBg {
+	background: linear-gradient(to right, #963beb, #830bba, #c00fb4, #e9d596);
+    background-size: 370% 370%!important;
+    height: 625px;
+	-webkit-animation: bggradient 20s ease-in-out infinite;
+	-moz-animation: bggradient 20s ease-in-out infinite;
+	-o-animation: bggradient 20s ease-in-out infinite;
+	animation: bggradient 20s ease-in-out infinite;
+	font-size:16px;
+    
+}
+.swapButton{
+    background: linear-gradient(to right, #963beb, #830bba, #c00fb4, #e9d596);
+    background-size: 370% 370%!important;
+    animation: bggradient 20s ease-in-out infinite;
+    color:white;
+    border: #C6C6C6 1px solid!important;
+    border-radius:10px;
+}
+
+.snapAlgoDefaultButton-alt{
+    
+    text-align: center;
+    width: 120px;
+    font-size: 12px;
+    font-family: 'Kantumruy Pro', sans-serif;
+    color: white;
+    cursor: pointer;
+    margin: 2px;
+    height: 35px;
+    text-align:center;
+    border: none;
+    font-size: 15px;
+    background-position: 0% 0%;
+    background-size: 300% 300%;
+    border-radius: 10px;
+    moz-transition: all .4s ease-in-out;
+    -o-transition: all .4s ease-in-out;
+    -webkit-transition: all .4s ease-in-out;
+    transition: all .4s ease-in-out;
+    background-image: radial-gradient(circle at 110%,  #963beb 60%,  #0ba0e5 20% );
+    font-weight: 500;
+  }
+
+  .snapAlgoDefaultButton-alt:hover {
+    background-position: 70% -0%;
+    background-size: 500% 500%;
+    color: white;
+    transform: scale(1.05);
+    moz-transition: all .3s ease-in-out;
+    -o-transition: all .3s ease-in-out;
+    -webkit-transition: all .3s ease-in-out;
+    transition: all .3s ease-in-out;
+  }
+
+  .snapAlgoDefaultButton{
+    
+    text-align: center;
+    font-size: 12px;
+    font-family: 'Kantumruy Pro', sans-serif;
+    color: white;
+    cursor: pointer;
+    margin: 2px;
+    text-align:center;
+    border: none;
+    font-size: 15px;
+    background-position: 0% 0%;
+    background-size: 300% 300%;
+    border-radius: 10px;
+    moz-transition: all .4s ease-in-out;
+    -o-transition: all .4s ease-in-out;
+    -webkit-transition: all .4s ease-in-out;
+    transition: all .4s ease-in-out;
+    background-image: radial-gradient(circle at 110%,  #0ba0e5 60%,   #963beb 20% );
+    font-weight: 500;
+  }
+
+  .snapAlgoDefaultButton:hover {
+    background-position: 70% -0%;
+    background-size: 500% 500%;
+    color: white;
+    transform: scale(2);
+    moz-transition: all .3s ease-in-out;
+    -o-transition: all .3s ease-in-out;
+    -webkit-transition: all .3s ease-in-out;
+    transition: all .3s ease-in-out;
+  }
+
+p{
+    color:white;
+}
+@keyframes shrink {
+    
+    to {
+        height: 20%;
+    }
+}
+@-webkit-keyframes bggradient {
+    0%{background-position:0% 50%}
+    50%{background-position:100% 50%}
+    100%{background-position:0% 50%}
+}
+@-moz-keyframes bggradient {
+    0%{background-position:0% 50%}
+    50%{background-position:100% 50%}
+    100%{background-position:0% 50%}
+}
+@-o-keyframes bggradient {
+    0%{background-position:0% 50%}
+    50%{background-position:100% 50%}
+    100%{background-position:0% 50%}
+}
+@keyframes bggradient { 
+    0%{background-position:0% 50%}
+    50%{background-position:100% 50%}
+    100%{background-position:0% 50%}
+}
+
+@keyframes slideUp {
+    0%{
+        top: 85%;
+    }
+    100%{
+        top: 5%;
+    }
+}
+
+@keyframes slideDown {
+    0%{
+        top: 5%;
+    }
+    100%{
+        top: 85%;
+    }
+}
+
+@keyframes rotateDown{
+    0%{
+        transform: rotate(0deg)
+    }
+    100%{
+        transform: rotate(180deg)
+    }
+}
+@keyframes rotateUp{
+    0%{
+        transform: rotate(180deg);
+    }
+    100%{
+        transform: rotate(0deg);
+    }
+}
