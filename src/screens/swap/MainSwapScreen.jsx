@@ -35,20 +35,28 @@ export default function MainSwapScreen(){
     const [spendable, setSpendable] = useState(null);
 
     useEffect(()=> { updateInputs(inputAmount, fromValue.value, toValue.value) }, [toValue, fromValue, inputAmount])
-    useEffect(async ()=> {
+
+    useEffect(() => {
+        async function updateMin(){
         let min = await getMin(fromValue.value, toValue.value);
         console.log("min is ", min);
         console.log("input amount is ", inputAmount);
         if(min > inputAmount){
             console.log("here");
             setInputAmount(min);
-        }
+        }}
+        updateMin();
     }, [toValue, fromValue])
-    useEffect(async ()=>{
+
+    useEffect(() => {
+        async function updateSpendable(){
         setSpendable(await Utils.getBalance(fromValue.value))
+        }
+        updateSpendable();
     }, [fromValue])
 
-    useEffect(async () => {
+    useEffect(() => {
+        async function initialLoad(){
         setLoading(true);
         let min = await Utils.getMin(fromValue.value, toValue.value);
         if(min.failure){
@@ -67,7 +75,9 @@ export default function MainSwapScreen(){
         const algoBalance = await Utils.getBalance('algo');
         console.log(algoBalance);
         setSpendable(algoBalance);
-    }, [])
+        }
+        initialLoad();
+    })
 
     useEffect(()=>{
         if(loading){
@@ -210,9 +220,9 @@ export default function MainSwapScreen(){
                 <div className="row" style={{marginTop:'10px'}}>
                     <div>
                         <p style={{margin:'0', textAlign:'right', display:'block'}}>
-                            <span style={{backgroundColor:'#963beb', padding:'5px', paddingLeft:"10px", borderRadius: '8px 8px 0% 0%'}}>Balance: {spendable} {fromValue.value}</span>
+                            <span style={{backgroundColor:'black', padding:'5px', paddingLeft:"10px", borderRadius: '8px 8px 0% 0%'}}>Balance: {spendable} {fromValue.value}</span>
                         </p>
-                        <div style={{backgroundColor:'#963beb', borderRadius: '8px 0px 8px 8px'}}>
+                        <div style={{backgroundColor:'black', borderRadius: '8px 0px 8px 8px'}}>
                             <div style={{display: "flex", padding:'8px', }}> 
                                 <input type="number" onChange={handleInputValueChange} value={inputAmount} style={{border:'#C6C6C6 1px solid', width:'100%', textAlign: 'center'}}/>
                                 <Button style={{maxHeight: '35px', fontSize:'10px'}} onClick={setMax}>max</Button>
@@ -229,13 +239,13 @@ export default function MainSwapScreen(){
         </div>
         <div className='row' style={{maxWidth:'330px'}}>
             <div className='col'>
-                <img src={ hoverSwap? swapSideIcon:downArrow} alt='' onClick={swapSide} style={{margin:'5px', cursor:'pointer', filter:"invert(100%)"}} onMouseEnter={()=>setHoverSwap(true)} onMouseLeave={()=>setHoverSwap(false)} />
+                <img src={ hoverSwap? swapSideIcon:downArrow} alt='' onClick={swapSide} style={{margin:'5px', cursor:'pointer'}} onMouseEnter={()=>setHoverSwap(true)} onMouseLeave={()=>setHoverSwap(false)} />
             </div>
         </div>
         
         <div className='row' style={{maxWidth:'330px'}}>
             <div className='col'>
-            <div style={{backgroundColor:'#963beb' , padding:'4px', borderRadius: '8px 8px 8px 0px'}}>
+            <div style={{backgroundColor:'black' , padding:'4px', borderRadius: '8px 8px 8px 0px'}}>
                 <div style={{marginRight: '8px', marginLeft: '8px', marginTop: '5px', marginBottom:'5px'}}>
                     <Select value={toValue} onChange={handleToChange} options={options}/>
                 </div>
@@ -245,7 +255,7 @@ export default function MainSwapScreen(){
             <>
             {warning?null:
             <div>
-                <p style={{textAlign:'left', }}><span style={{backgroundColor:'#963beb', padding:'5px', paddingLeft:'14px', paddingRight:'10px', textAlign:'left', borderRadius: '0px 0px 8px 8px'}}>estimated {outputAmount} {toValue.value}</span></p>
+                <p style={{textAlign:'left', }}><span style={{backgroundColor:'black', padding:'5px', paddingLeft:'14px', paddingRight:'10px', textAlign:'left', borderRadius: '0px 0px 8px 8px'}}>estimated {outputAmount} {toValue.value}</span></p>
             </div>
             }
             </>

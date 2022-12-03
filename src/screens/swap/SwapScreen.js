@@ -10,11 +10,11 @@ export default function SwapScreen() {
     const [screen, setScreen] = useState("swap");
     const [slideAnimation, setSlideAnimation] = useState('none');
     const [rotateAnimation, setRotateAnimation] = useState('none');
-    const [clickTitle, setClickTitle] = useState('View Swaps');
+    const [clickTitle, setClickTitle] = useState('View History');
 
     useEffect(() => {
         preload();
-    }, []);
+    });
 
     const preload = async () => {
         await enable();
@@ -33,20 +33,19 @@ export default function SwapScreen() {
             setSlideAnimation('slideDown 0.5s forwards');
             setRotateAnimation('rotateUp 0.5s forwards');
             setScreen('swap')
-            setClickTitle('View Swaps')
+            setClickTitle('View History')
         }
     }
 
-    return (
-    <div style={{"height":"100vh"}} >  
+    return ( 
     <div align="center" style={{paddingTop:"15px"}}>
         
         
-            {/* {screen==='swap'?
+            {screen==='swap'?
                 <MainSwapScreen/>
                 :
                 null
-            } */}
+            }
             {/* {screen==='history'?
                 <HistorySwapScreen/>
             :
@@ -58,11 +57,11 @@ export default function SwapScreen() {
             position: 'absolute',
             left:'50%', 
             transform:'translateX(-50%)',
-            top:'85%', 
+            top:'80%', 
             textAlign:'center',
             width:"330px",
-            backgroundColor: '#963beb',
-            color:'black',
+            backgroundColor: 'black',
+            color:'white',
             borderRadius:'5px',
             cursor: 'pointer',
             animation: slideAnimation
@@ -74,7 +73,6 @@ export default function SwapScreen() {
                 <img height='30' width='30' style={{filter:'invert(1)', position:'absolute', right:'5px', top:'-3px', animation:rotateAnimation}} src={openUp} alt=''/>
             </span>
         </span>
-    </div>
     </div>
     );
 

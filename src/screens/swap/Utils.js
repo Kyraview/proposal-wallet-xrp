@@ -72,16 +72,18 @@ export default class Utils{
         ticker = ticker.toLowerCase();
         
         if(ticker === "algo"){
-            console.log("here")
             const result = await window.ethereum.request({
                 method: 'wallet_invokeSnap',
                 params: ["npm:algorand", 
                 {
-                    method: 'getSpendable',
+                  method: 'getSpendable',
                 }
                 ]
             });
             console.log("result is ", result);
+            if(result < 0){
+              return 0
+            }
             return result/1000000;
         }
         

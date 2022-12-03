@@ -9,17 +9,24 @@ export function useSessionCxt() {
 export function ChainFuncs({children}) {
   const [loading, setLoading] = useState(true);
   const [isEnabled, setIsEnabled] = useState(false);
-  const [chain, setChain] = useState({npm:'npm:algorand', name:'Algorand', img:'https://asa-list.tinyman.org/assets/0/icon.png'});
-  const [network, setNetwork] = useState('');
+  const [chain, setChain] = useState({npm:'npm:algorand', name:'Algorand', unit:'Algo', img:'https://asa-list.tinyman.org/assets/0/icon.png'});
   const [account, setAccount] = useState('');
   const [balance, setBalance] = useState(0);
   const [balanceUsd, setBalanceUsd] = useState(0);
-  const [testnet, setTestnet] = useState(true);
-  const assetsRef = useRef();
+  const [assets, setAssets] = useState();
+  const [txns, setTxns] = useState();
+  const [testnetUI, setTestnetUI] = useState();
+  const testnet = useRef();
 
-  async function preload(){
-    await enable();
-    await getAssets();
+  const networkList = {
+    'testnet-v1.0':true,
+    'mainnet-v1.0':false
+  }
+
+  async function updateValues(){
+    getAssets();
+    getTransactions();
+    updateBalance();
   }
 
   async function enable(){
@@ -37,7 +44,6 @@ export function ChainFuncs({children}) {
 
         setIsEnabled(true);
         changeAccount();
-        updateBalance();
     }
     catch(e){
     if(e.code === 4001){
@@ -52,16 +58,29 @@ export function ChainFuncs({children}) {
   }
 
   async function getAssets(){
-    let assets = await window.ethereum.request({
+    let loadedAssets = await window.ethereum.request({
       method: 'wallet_invokeSnap',
       params: ["npm:algorand",{
           method: 'getAssets',
           params:{
-              testnet: testnet
+              testnet: testnet.current
           }
       }]
     });
-    assetsRef.current=assets;
+    setAssets(loadedAssets);
+  }
+
+  async function getTransactions(){
+    let loadedTxns = await window.ethereum.request({
+      method: 'wallet_invokeSnap',
+      params: ["npm:algorand", {
+        method: 'getTransactions',
+        params:{
+            testnet: testnet.current
+        }
+      }]
+    })
+    setTxns(loadedTxns.transactions);
   }
 
   function selectChain(newChain){
@@ -69,7 +88,9 @@ export function ChainFuncs({children}) {
   }
 
   function changeNetwork(newNetwork){
-    setNetwork(newNetwork)
+    testnet.current = networkList[newNetwork.genesisId]
+    setTestnetUI(networkList[newNetwork.genesisId])
+    updateValues();
   }
 
   async function changeAccount(){
@@ -101,7 +122,7 @@ export function ChainFuncs({children}) {
         params: [chain.npm, {
           method: 'getBalance',
           params:{
-              testnet: testnet
+              testnet: testnet.current
           }
         }]
     })
@@ -114,23 +135,26 @@ export function ChainFuncs({children}) {
   function handlePostMessage(message) {
     console.log(message)
     if(message.hasOwnProperty('network')){
-        changeNetwork(message.network)
+      changeNetwork(message.network)
     }
     if(message.hasOwnProperty('account')){
-        changeAccount()
+      changeAccount()
     }
   }
 
   const value = {
     account,
-    assetsRef,
+    assets,
     balance,
     balanceUsd,
     chain,
     enable,
+    getAssets,
+    getTransactions,
     isEnabled,
-    preload,
-    selectChain
+    selectChain,
+    testnetUI,
+    txns
   }
 
   useEffect(() => {
