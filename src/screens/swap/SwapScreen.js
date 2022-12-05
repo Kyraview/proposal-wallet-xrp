@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import {useSessionCxt} from '../../ChainFuncs.js';
+import {useUiCxt} from '../../UiFuncs.js';
 import MainSwapScreen from './MainSwapScreen.jsx';
+import HistorySwapScreen from './HistorySwapScreen.jsx';
 import web3 from 'web3';
 import openUp from './imgs/openUp.svg';
-import HistorySwapScreen from './HistorySwapScreen.jsx';
 
 export default function SwapScreen() {
     const {enable} = useSessionCxt();
+    const {setBubbleHeight,setBubbleWidth} = useUiCxt();
     const [screen, setScreen] = useState("swap");
     const [slideAnimation, setSlideAnimation] = useState('none');
     const [rotateAnimation, setRotateAnimation] = useState('none');
@@ -17,9 +19,9 @@ export default function SwapScreen() {
     });
 
     const preload = async () => {
-        await enable();
         window.web3 = new web3(window.ethereum);
         window.ethAddress = (await window.ethereum.request({ method: 'eth_requestAccounts' }))[0];
+        setBubbleHeight(600);
     }
 
     const toggleHistory = async ()=>{
@@ -38,11 +40,11 @@ export default function SwapScreen() {
     }
 
     return ( 
-    <div align="center" style={{paddingTop:"15px"}}>
+    <div align="center">
         
         
             {screen==='swap'?
-                <MainSwapScreen/>
+                <MainSwapScreen />
                 :
                 null
             }

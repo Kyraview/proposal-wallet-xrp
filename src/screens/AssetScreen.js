@@ -1,5 +1,6 @@
 import { useRef, useEffect, useState } from 'react';
 import { ListGroup, ListGroupItem } from 'react-bootstrap';
+import { Vortex } from 'react-loader-spinner';
 import { useSessionCxt } from '../ChainFuncs.js';
 import SendCard from './SendCard';
 import ReceiveCard from './ReceiveCard';
@@ -9,9 +10,11 @@ import sendIcon from '../imgs/send.svg';
 export default function AssetScreen(){
     const {chain, account, balance, balanceUsd, assets} = useSessionCxt();
     const [assetsList, setAssetList] = useState(null);
+    const [loading, setLoading] = useState(true);
     const openAsset = useRef();
 
     useEffect(() => {
+        setLoading(true);
         if(!assets){
             return;
         }
@@ -45,6 +48,7 @@ export default function AssetScreen(){
             </ListGroupItem>
         );
         setAssetList(list);
+        setLoading(false);
     }, [assets, account.addr])
 
     function toggleCard(asset) {
@@ -61,6 +65,7 @@ export default function AssetScreen(){
     }
 
     return(
+        <div>
         <ListGroup style={{width:'80vw'}}>
             <ListGroupItem  style={{padding:'5px 0'}}>
                 <div style={{display:'flex', flexDirection:'row'}}>
@@ -85,5 +90,20 @@ export default function AssetScreen(){
             </ListGroupItem>
             {assetsList}
         </ListGroup>
+        
+        {loading?
+        <Vortex
+            visible={true}
+            height="140"
+            width="140"
+            ariaLabel="vortex-loading"
+            wrapperStyle={{}}
+            wrapperClass="vortex-wrapper"
+            colors={['black', 'gray']}
+        />
+        :
+        null
+        }
+        </div>
     );
 }

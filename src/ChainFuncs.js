@@ -9,7 +9,7 @@ export function useSessionCxt() {
 export function ChainFuncs({children}) {
   const [loading, setLoading] = useState(true);
   const [isEnabled, setIsEnabled] = useState(false);
-  const [chain, setChain] = useState({npm:'npm:algorand', name:'Algorand', unit:'Algo', img:'https://asa-list.tinyman.org/assets/0/icon.png'});
+  const [chain, setChain] = useState({npm:'npm:algorand', name:'Algorand', ticker:'Algo', img:'https://asa-list.tinyman.org/assets/0/icon.png'});
   const [account, setAccount] = useState('');
   const [balance, setBalance] = useState(0);
   const [balanceUsd, setBalanceUsd] = useState(0);
@@ -57,10 +57,64 @@ export function ChainFuncs({children}) {
     }
   }
 
+  async function transfer(txn){
+    try {
+    let result = await window.ethereum.request({
+      method: 'wallet_invokeSnap',
+      params: [chain.npm,{
+          method: 'transfer',
+          params:{
+              amount: txn.amount,
+              testnet: testnet.current,
+              to: txn.to
+          }
+      }]
+    });
+    return result
+    } catch (err) {
+      return{ error:true,
+              msg:'transaction failed'}
+    }
+  }
+
+  async function transferAsset(txn){
+    try {
+    let result = await window.ethereum.request({
+      method: 'wallet_invokeSnap',
+      params: [chain.npm,{
+          method: 'transferAsset',
+          params:{
+              amount: txn.amount,
+              assetIndex: txn.assetIndex,
+              testnet: testnet.current,
+              to: txn.to
+          }
+      }]
+    });
+    return result
+    } catch (err) {
+      return{ error:true,
+              msg:'transaction failed'}
+    }
+  }
+
+  async function checkAddress(address){
+    let result = await window.ethereum.request({
+      method: 'wallet_invokeSnap',
+      params: [chain.npm,{
+          method: 'isValidAddress',
+          params:{
+              address: address
+          }
+      }]
+    });
+    return result
+  }
+
   async function getAssets(){
     let loadedAssets = await window.ethereum.request({
       method: 'wallet_invokeSnap',
-      params: ["npm:algorand",{
+      params: [chain.npm,{
           method: 'getAssets',
           params:{
               testnet: testnet.current
@@ -73,7 +127,7 @@ export function ChainFuncs({children}) {
   async function getTransactions(){
     let loadedTxns = await window.ethereum.request({
       method: 'wallet_invokeSnap',
-      params: ["npm:algorand", {
+      params: [chain.npm, {
         method: 'getTransactions',
         params:{
             testnet: testnet.current
@@ -133,7 +187,6 @@ export function ChainFuncs({children}) {
   }
 
   function handlePostMessage(message) {
-    console.log(message)
     if(message.hasOwnProperty('network')){
       changeNetwork(message.network)
     }
@@ -148,13 +201,17 @@ export function ChainFuncs({children}) {
     balance,
     balanceUsd,
     chain,
+    checkAddress,
     enable,
     getAssets,
     getTransactions,
     isEnabled,
     selectChain,
     testnetUI,
-    txns
+    transfer,
+    transferAsset,
+    txns,
+    updateValues
   }
 
   useEffect(() => {

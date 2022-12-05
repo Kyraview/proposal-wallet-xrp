@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import {useSessionCxt} from '../../ChainFuncs.js';
 import Button from 'react-bootstrap/Button';
 import Alert from 'react-bootstrap/Alert';
 import Select from 'react-select';
@@ -8,7 +9,7 @@ import algoLogo from './imgs/algoLogo.png';
 import ethLogo from './imgs/ethLogo.png';
 import bnbLogo from './imgs/bnbLogo.png';
 import './bggradient.css';
-import { Vortex } from 'react-loader-spinner'
+import { Vortex } from 'react-loader-spinner';
 import Utils  from './Utils.js';
 
 
@@ -26,108 +27,64 @@ export default function MainSwapScreen(){
     const [fromValue, setFrom] = useState(options[0]);
     const [toValue, setTo] = useState(options[1]);
     const [hoverSwap, setHoverSwap] = useState(false);
-    const [outputAmount, setOutputAmount] = useState(null);
     const [inputAmount, setInputAmount] = useState(null);
+    const [outputAmount, setOutputAmount] = useState(null);
     const [warningText, setWarningText] = useState(<>Inputed amount is less<br/>than the minium amount</>)
     const [loading, setLoading] = useState(false);
     const [min, setMin] = useState(null);
     const [warning, setWarning] = useState(false);
     const [spendable, setSpendable] = useState(null);
-
-    useEffect(()=> { updateInputs(inputAmount, fromValue.value, toValue.value) }, [toValue, fromValue, inputAmount])
-
-    useEffect(() => {
-        async function updateMin(){
-        let min = await getMin(fromValue.value, toValue.value);
-        console.log("min is ", min);
-        console.log("input amount is ", inputAmount);
-        if(min > inputAmount){
-            console.log("here");
-            setInputAmount(min);
-        }}
-        updateMin();
-    }, [toValue, fromValue])
+    const {chain} = useSessionCxt();
 
     useEffect(() => {
-        async function updateSpendable(){
-        setSpendable(await Utils.getBalance(fromValue.value))
-        }
-        updateSpendable();
-    }, [fromValue])
-
-    useEffect(() => {
-        async function initialLoad(){
-        setLoading(true);
-        let min = await Utils.getMin(fromValue.value, toValue.value);
-        if(min.failure){
-            setWarningText(min.error);
-            setWarning(true);
-            setLoading(false);
-            return;
-        }
-        else{
-            min = min.minAmount
-        }
-        console.log("min is");
-        console.log(min);
-        setInputAmount(min);
-        setLoading(false);
-        const algoBalance = await Utils.getBalance('algo');
-        console.log(algoBalance);
-        setSpendable(algoBalance);
-        }
         initialLoad();
     })
 
-    useEffect(()=>{
-        if(loading){
-            setWarning(false);
-        }
-    }, [loading])
-
-
-
-    const handleFromChange = async (selectedOption) => {
-        console.log(selectedOption);
-        const min = await getMin(selectedOption.value, toValue.value);
-        setInputAmount(min);
-        setFrom(selectedOption);
-        
+    const initialLoad = async() =>{
+        setLoading(true);
+        getMin(fromValue.value, toValue.value);
+        const algoBalance = await Utils.getBalance('algo', chain);
+        setSpendable(algoBalance);
+        console.log('rendered')
+        setLoading(false);
     }
 
     const getMin = async (fromTicker, toTicker)=>{
-        const min = await Utils.getMin(fromTicker, toTicker);
+        const min = await Utils.getMin(fromTicker, toTicker, chain);
         if(min.failure){
             setWarningText(min.error);
             setWarning(true);
             setMin(0);
-            return 0;
         }
         setMin(min.minAmount);
-        return min.minAmount;
+    }
+
+    const setMax = () =>{
+        setInputAmount(spendable);
+    }
+
+    const handleFromChange = async (selectedOption) => {
+        getMin(selectedOption.value, toValue.value);
+        setFrom(selectedOption);
     }
 
     const handleToChange = async (selectedOption) => {
-        Utils.getMin(fromValue.value, selectedOption.value);
-        const min = await getMin(fromValue.value, selectedOption.value);
-        setInputAmount(min);
+        getMin(fromValue.value, selectedOption.value);
         setTo(selectedOption);
-        
     }
 
     const swapSide = () => {
-        let hold = fromValue;
+        let newTo = fromValue;
         setFrom(toValue);
-        setTo(hold);
-        
+        setTo(newTo);
+        updateInputs(inputAmount, fromValue.value, toValue.value);
     }
 
     const handleInputValueChange = (e) =>{
-        console.log(e.target.value);
         setWarning(false);
         let num = Number(e.target.value);
-        if(num === 0){
-            num = null;
+        if(num < 0){
+            num = 0;
         }
         setInputAmount(num);
     }
@@ -136,7 +93,7 @@ export default function MainSwapScreen(){
         try{
         const output = await window.ethereum.request({
             method: 'wallet_invokeSnap',
-            params: ["npm:algorand", 
+            params: [chain.npm, 
             {
                 method: 'swap',
                 params:{
@@ -149,17 +106,11 @@ export default function MainSwapScreen(){
         });
         console.log(output);
         setSwapSuccess(true);
-        }
-        catch(e){
+        } catch(e){
         console.log(e);
         setSwapSuccess(false);
         setError(true);
         }
-
-    }
-
-    const setMax = () =>{
-        setInputAmount(spendable);
     }
 
     const updateInputs = async (inputAmount, fromTicker, toTicker) => {
@@ -167,12 +118,9 @@ export default function MainSwapScreen(){
             return true;
         }
         setLoading(true);
-        console.log(inputAmount);
-        console.log(toTicker);
-        console.log(fromTicker); 
         const result = await window.ethereum.request({
             method: 'wallet_invokeSnap',
-            params: ["npm:algorand", 
+            params: [chain.npm, 
             {
                 method: 'preSwap',
                 params:{
@@ -186,25 +134,16 @@ export default function MainSwapScreen(){
         console.log("preswap result is");
         console.log(result);
         if(result.failure){
-            console.log("here")
             setWarningText(<>{result.error}</>);
             setWarning(true);
             setLoading(false);
             return;
-        }
-        if(Number(result.minAmount) > Number(result.amount)){
-            setMin(Number(result.minAmount));
-            console.log("here");
-            setWarningText(<>Inputed amount is less<br/>than the minium amount</>)
-            setWarning(true);
-        }
-        else{
+        } else{
             setWarning(false);
         }
         setOutputAmount(result.estimatedAmount);
         console.log(result);
         setLoading(false);
-        
     }
 
     return(
@@ -230,6 +169,7 @@ export default function MainSwapScreen(){
                             <div style={{marginRight: '8px', marginLeft: '8px', marginBottom: '5px'}}>
                              <Select width="100" value={fromValue} onChange={handleFromChange} options={options}/>
                             </div>
+                            <p style={{margin:'0 2vw', textAlign:'left', display:'block', fontSize:'2.5vw'}}>min: {min} {fromValue.value}</p>
                             <div style={{height:'4px'}}></div>
                         </div>
                         
@@ -245,30 +185,30 @@ export default function MainSwapScreen(){
         
         <div className='row' style={{maxWidth:'330px'}}>
             <div className='col'>
-            <div style={{backgroundColor:'black' , padding:'4px', borderRadius: '8px 8px 8px 0px'}}>
-                <div style={{marginRight: '8px', marginLeft: '8px', marginTop: '5px', marginBottom:'5px'}}>
-                    <Select value={toValue} onChange={handleToChange} options={options}/>
+                <div style={{backgroundColor:'black' , padding:'4px', borderRadius: '8px 8px 8px 0px'}}>
+                    <div style={{marginRight: '8px', marginLeft: '8px', marginTop: '5px', marginBottom:'5px'}}>
+                        <Select value={toValue} onChange={handleToChange} options={options}/>
+                    </div>
                 </div>
-            </div>
-            {
-            !loading?
-            <>
-            {warning?null:
-            <div>
-                <p style={{textAlign:'left', }}><span style={{backgroundColor:'black', padding:'5px', paddingLeft:'14px', paddingRight:'10px', textAlign:'left', borderRadius: '0px 0px 8px 8px'}}>estimated {outputAmount} {toValue.value}</span></p>
-            </div>
-            }
-            </>
-            :<Vortex
-                visible={true}
-                height="140"
-                width="140"
-                ariaLabel="vortex-loading"
-                wrapperStyle={{}}
-                wrapperClass="vortex-wrapper"
-                colors={['#963beb', '#830bba', '#c00fb4', '#e9d596','yellow', 'white']}
-            />
-            }
+                {!loading?
+                <div>
+                    {warning?null:
+                    <div>
+                        <p style={{textAlign:'left', }}><span style={{backgroundColor:'black', padding:'5px', paddingLeft:'14px', paddingRight:'10px', textAlign:'left', borderRadius: '0px 0px 8px 8px'}}>estimated {outputAmount} {toValue.value}</span></p>
+                    </div>
+                    }
+                </div>
+                :
+                <Vortex
+                    visible={true}
+                    height="140"
+                    width="140"
+                    ariaLabel="vortex-loading"
+                    wrapperStyle={{}}
+                    wrapperClass="vortex-wrapper"
+                    colors={['black', 'gray']}
+                />
+                }
             </div>
         </div>
         
@@ -277,7 +217,8 @@ export default function MainSwapScreen(){
         <div style={{"backgroundColor":"#111", "margin":'auto' }}>
             <p style={{"margin":"auto"}}>{warningText}</p>
         </div>
-        :loading?null:<Button className="snapAlgoDefaultButton-alt" onClick={swapToken}>Swap</Button>
+        :
+        loading?null:<Button className="snapAlgoDefaultButton-alt" onClick={swapToken}>Swap</Button>
         }
         
         

@@ -1,4 +1,3 @@
-
 const chains = {
     'eth':{
         type:'native',
@@ -21,14 +20,14 @@ const chains = {
     }
 }
 export default class Utils{
-    static async getMin(fromTicker, toTicker){
+    static async getMin(fromTicker, toTicker, chain){
         fromTicker = fromTicker.toLowerCase();
         toTicker = toTicker.toLowerCase();
         console.log("from ticker is", fromTicker);
         console.log("to ticker is", toTicker);
         const result = await window.ethereum.request({
             method: 'wallet_invokeSnap',
-            params: ["npm:algorand", 
+            params: [chain.npm, 
             {
                 method: 'getMin',
                 params:{
@@ -68,13 +67,13 @@ export default class Utils{
             // handle other "switch" errors
           }
     }
-    static async getBalance(ticker){
+    static async getBalance(ticker, chain){
         ticker = ticker.toLowerCase();
         
         if(ticker === "algo"){
             const result = await window.ethereum.request({
                 method: 'wallet_invokeSnap',
-                params: ["npm:algorand", 
+                params: [chain.npm, 
                 {
                   method: 'getSpendable',
                 }
