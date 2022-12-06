@@ -98,6 +98,27 @@ export function ChainFuncs({children}) {
     }
   }
 
+  async function createAccount(name){
+    await window.ethereum.request({
+      method: 'wallet_invokeSnap',
+      params: [chain.npm,{
+          method: 'createAccount',
+          params:{
+              name: name
+          }
+      }]
+    });
+  }
+
+  async function showMnemonic(){
+    await window.ethereum.request({
+      method: 'wallet_invokeSnap',
+      params: [chain.npm,{
+          method: 'displayMnemonic'
+      }]
+    });
+  }
+
   async function checkAddress(address){
     let result = await window.ethereum.request({
       method: 'wallet_invokeSnap',
@@ -202,11 +223,13 @@ export function ChainFuncs({children}) {
     balanceUsd,
     chain,
     checkAddress,
+    createAccount,
     enable,
     getAssets,
     getTransactions,
     isEnabled,
     selectChain,
+    showMnemonic,
     testnetUI,
     transfer,
     transferAsset,

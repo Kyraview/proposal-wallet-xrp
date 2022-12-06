@@ -3,6 +3,7 @@ import { useSessionCxt } from '../ChainFuncs.js';
 import AssetScreen from './AssetScreen';
 import LedgerScreen from './LedgerScreen';
 import SwapScreen from './swap/SwapScreen';
+import AccountScreen from './AccountScreen';
 import accountIcon from '../imgs/account.svg';
 import assetIcon from '../imgs/wallet.svg';
 import ledgerIcon from '../imgs/ledger.svg';
@@ -42,6 +43,10 @@ export default function BaseScreen(){
                 null}
                 {screen==='swap' && !testnetUI?
                 <SwapScreen />
+                :
+                null}
+                {screen==='account'?
+                <AccountScreen />
                 :
                 null}
                 </div>

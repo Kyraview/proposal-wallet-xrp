@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import {useSessionCxt} from '../../ChainFuncs.js';
 import {useUiCxt} from '../../UiFuncs.js';
 import MainSwapScreen from './MainSwapScreen.jsx';
 import HistorySwapScreen from './HistorySwapScreen.jsx';
@@ -7,8 +6,7 @@ import web3 from 'web3';
 import openUp from './imgs/openUp.svg';
 
 export default function SwapScreen() {
-    const {enable} = useSessionCxt();
-    const {setBubbleHeight,setBubbleWidth} = useUiCxt();
+    const {setBubbleHeight} = useUiCxt();
     const [screen, setScreen] = useState("swap");
     const [slideAnimation, setSlideAnimation] = useState('none');
     const [rotateAnimation, setRotateAnimation] = useState('none');
@@ -48,11 +46,11 @@ export default function SwapScreen() {
                 :
                 null
             }
-            {/* {screen==='history'?
+            {screen==='history'?
                 <HistorySwapScreen/>
             :
                 null
-            } */}
+            }
        
         
         <span style={{

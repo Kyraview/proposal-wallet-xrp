@@ -1,15 +1,20 @@
 import React, { useState, useEffect } from 'react';
+import {useSessionCxt} from '../../ChainFuncs.js';
 import downArrow from './imgs/downArrow.png';
 import { ProgressBar } from 'react-loader-spinner';
 import moment from 'moment';
 import {Status} from './Status'
 
 export default function HistorySwapScreen(){
+    const {chain} = useSessionCxt();
+    const [swapHistory, setSwapHistory] = useState([]);
+    const [tileProperties, setTileProperties] = useState({});
+    const [loading, setLoading] = useState(false)
+    
     useEffect( ()=>{
-        console.log("useEffect called")
         window.ethereum.request({
             method: 'wallet_invokeSnap',
-            params: ["npm:algorand", 
+            params: [chain.npm, 
             {
                 method: 'swapHistory',
             }
@@ -21,15 +26,11 @@ export default function HistorySwapScreen(){
             setSwapHistory(history)
             let tiles = {}
             for(const swap of history){
-                
                 tiles[swap.id] = {display:'none', status:null, loading:false}
             }
             setTileProperties(tiles)
         })
     }, [])
-    const [swapHistory, setSwapHistory] = useState([]);
-    const [tileProperties, setTileProperties] = useState({});
-    const [loading, setLoading] = useState(false)
     
     const getStatus = async (id)=>{
         let copyProperties =JSON.parse(JSON.stringify(tileProperties));
@@ -44,7 +45,7 @@ export default function HistorySwapScreen(){
         setLoading(true)
         const result = await window.ethereum.request({
             method: 'wallet_invokeSnap',
-            params: ["npm:algorand", 
+            params: [chain.npm, 
             {
                 method: 'getSwapStatus',
                 params:{
@@ -62,7 +63,7 @@ export default function HistorySwapScreen(){
     }
     
     return(
-        <div className='row' style={{maxWidth:'330px', marginTop:'65px'}}>
+        <div className='row' style={{maxWidth:'330px', marginTop:'65px', color:'black'}}>
             <div style={{display:'flex', justifyContent:'space-between'}}>
                 <p>swap history</p>
                 <span style={{transform:'translateY(-25%)', height:'55px'}}>
@@ -73,8 +74,8 @@ export default function HistorySwapScreen(){
                     ariaLabel="progress-bar-loading"
                     wrapperStyle={{}}
                     wrapperClass="vortex-wrapper"
-                    borderColor = 'white'
-                    barColor = 'white'
+                    borderColor = 'black'
+                    barColor = 'black'
                 />
                 </span>
             </div>
@@ -86,7 +87,7 @@ export default function HistorySwapScreen(){
                         <span style={{display:'flex', justifyContent:'space-between'}}>
                             <span style={{display:'flex'}}>
                                 <p>{item.fromCurrency}</p>
-                                <img height="25" width="25" style={{filter:'invert(1)', transform:'rotate(-90deg)'}} src={downArrow}/>
+                                <img height="25" width="25" style={{filter:'invert(1)', transform:'rotate(-90deg)'}} src={downArrow} alt=''/>
                                 <p>{item.toCurrency}</p>
                             </span>
                             <button 
@@ -96,7 +97,7 @@ export default function HistorySwapScreen(){
                                 display:'block',
                                 borderRadius:'5px',
                                 backgroundColor:'#963beb',
-                                color:'white',
+                                color:'black',
                                 border:'none'
                             }}
                             onClick={()=>getStatus(item.id)}
@@ -116,7 +117,7 @@ export default function HistorySwapScreen(){
                                 <div style={{display:'flex', justifyContent:'end'}}>
                                 <p style={{marginRight:'5px', fontSize:'12px'}}>{tileProperties[item.id].statis.amountSend}</p>
                                 <p style={{marginRight:"10px", fontSize:'12px'}}>{tileProperties[item.id].statis.fromCurrency}</p>
-                                <img height="15" width="15" style={{filter:'invert(1)', transform:'rotate(-90deg)', marginRight:'10px'}} src={downArrow}/>
+                                <img height="15" width="15" style={{filter:'invert(1)', transform:'rotate(-90deg)', marginRight:'10px'}} src={downArrow} alt=''/>
                                 <p style={{marginRight:'10px', fontSize:'12px'}}>{tileProperties[item.id].statis.expectedReceiveAmount}</p>
                                 <p style={{fontSize: '12px'}}>{tileProperties[item.id].statis.toCurrency}</p>
                                 

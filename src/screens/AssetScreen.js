@@ -2,6 +2,7 @@ import { useRef, useEffect, useState } from 'react';
 import { ListGroup, ListGroupItem } from 'react-bootstrap';
 import { Vortex } from 'react-loader-spinner';
 import { useSessionCxt } from '../ChainFuncs.js';
+import {useUiCxt} from '../UiFuncs.js';
 import SendCard from './SendCard';
 import ReceiveCard from './ReceiveCard';
 import qrcodeIcon from '../imgs/qrcode.svg';
@@ -9,11 +10,13 @@ import sendIcon from '../imgs/send.svg';
 
 export default function AssetScreen(){
     const {chain, account, balance, balanceUsd, assets} = useSessionCxt();
+    const {setBubbleHeight} = useUiCxt();
     const [assetsList, setAssetList] = useState(null);
     const [loading, setLoading] = useState(true);
     const openAsset = useRef();
 
     useEffect(() => {
+        setBubbleHeight(350);
         setLoading(true);
         if(!assets){
             return;

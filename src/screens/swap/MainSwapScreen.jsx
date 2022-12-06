@@ -29,7 +29,7 @@ export default function MainSwapScreen(){
     const [hoverSwap, setHoverSwap] = useState(false);
     const [inputAmount, setInputAmount] = useState(null);
     const [outputAmount, setOutputAmount] = useState(null);
-    const [warningText, setWarningText] = useState(<>Inputed amount is less<br/>than the minium amount</>)
+    const [warningText, setWarningText] = useState(<>Inputed amount is less<br/>than the minimum amount</>)
     const [loading, setLoading] = useState(false);
     const [min, setMin] = useState(null);
     const [warning, setWarning] = useState(false);
@@ -38,16 +38,20 @@ export default function MainSwapScreen(){
 
     useEffect(() => {
         initialLoad();
-    })
+    }, [])
 
     const initialLoad = async() =>{
         setLoading(true);
-        getMin(fromValue.value, toValue.value);
+        await getMin(fromValue.value, toValue.value);
         const algoBalance = await Utils.getBalance('algo', chain);
         setSpendable(algoBalance);
         console.log('rendered')
         setLoading(false);
     }
+
+    useEffect(() => {
+        updateInputs(inputAmount,fromValue.value,toValue.value);
+    }, [inputAmount, fromValue, toValue])
 
     const getMin = async (fromTicker, toTicker)=>{
         const min = await Utils.getMin(fromTicker, toTicker, chain);
@@ -77,7 +81,6 @@ export default function MainSwapScreen(){
         let newTo = fromValue;
         setFrom(toValue);
         setTo(newTo);
-        updateInputs(inputAmount, fromValue.value, toValue.value);
     }
 
     const handleInputValueChange = (e) =>{
@@ -192,7 +195,7 @@ export default function MainSwapScreen(){
                 </div>
                 {!loading?
                 <div>
-                    {warning?null:
+                    {warning || outputAmount===null?null:
                     <div>
                         <p style={{textAlign:'left', }}><span style={{backgroundColor:'black', padding:'5px', paddingLeft:'14px', paddingRight:'10px', textAlign:'left', borderRadius: '0px 0px 8px 8px'}}>estimated {outputAmount} {toValue.value}</span></p>
                     </div>
@@ -218,7 +221,7 @@ export default function MainSwapScreen(){
             <p style={{"margin":"auto"}}>{warningText}</p>
         </div>
         :
-        loading?null:<Button className="snapAlgoDefaultButton-alt" onClick={swapToken}>Swap</Button>
+        loading || outputAmount===null?null:<Button className="snapAlgoDefaultButton-alt" onClick={swapToken}>Swap</Button>
         }
         
         

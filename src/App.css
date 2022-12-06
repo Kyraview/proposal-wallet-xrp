@@ -40,6 +40,44 @@
   background-image: radial-gradient(circle at 110%,  #F00699 60%,  #0ba0e5 20% );
 }
 
+.accountButton {
+  text-align: center;
+  width: 40vw;
+  font-size: 15px;
+  font-family: 'Kantumruy Pro', sans-serif;
+  color: white;
+  cursor: pointer;
+  margin: 2px;
+  height: 35px;
+  text-align:center;
+  border: none;
+  background-position: 0% 0%;
+  background-size: 300% 300%;
+  
+  background-image: radial-gradient(circle at 110%,  #F00699 60%,  #963beb 20% );
+  
+  border-radius: 10px;
+  moz-transition: all .4s ease-in-out;
+  -o-transition: all .4s ease-in-out;
+  -webkit-transition: all .4s ease-in-out;
+  transition: all .4s ease-in-out;
+}
+
+.accountButton:hover {
+  background-position: 70% -0%;
+  background-size: 500% 500%;
+  color: white;
+  transform: scale(1.05);
+  moz-transition: all .3s ease-in-out;
+  -o-transition: all .3s ease-in-out;
+  -webkit-transition: all .3s ease-in-out;
+  transition: all .3s ease-in-out;
+}
+
+.accountButton.alt{
+  background-image: radial-gradient(circle at 110%,  #F00699 60%,  #0ba0e5 20% );
+}
+
 .iconButtonDefault{
   width:10vw;
   filter: invert(100%);

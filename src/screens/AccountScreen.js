@@ -1,40 +1,43 @@
-import QRCode from "react-qr-code";
-import copyIcon from '../imgs/copy.svg';
-import { CopyToClipboard } from 'react-copy-to-clipboard';
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
+import { TextField } from "@mui/material";
 import {useSessionCxt} from '../ChainFuncs.js';
-
+import {useUiCxt} from '../UiFuncs.js';
+import Button from 'react-bootstrap/Button';
 
 export default function AccountScreen() {
-    const {address} = useSessionCxt();
-
-    const blink = () => {
-        document.getElementById('blinkAddress').style.color='#963beb';
-        setTimeout(function(){
-          document.getElementById('blinkAddress').style.color='black';
-        }, 100);
-    }
+    const {createAccount, showMnemonic} = useSessionCxt();
+    const {setBubbleHeight} = useUiCxt();
+    const [screen, setScreen] = useState('');
+    const nameRef = useRef();
 
     useEffect(() => {
-        //getAddress();
+        setBubbleHeight(300);
     }, []);
 
     return(
         <div>
-        <div style={{display:'flex', flexDirection:'row', justifyContent:'center'}}>
-        <div style={{borderRadius:'5px'}}>
-            <div style={{display:'flex', flexDirection:'row', justifyContent:'right', width:'50vw'}}>
-            <QRCode size={100} value={address} style={{background:'white'}}/>
+            {screen===''?
+            <div style={{display:'flex', flexDirection:'row', justifyContent:'center'}}>
+            <div style={{display:'flex', flexDirection:'column', marginTop:'3vw'}}>
+                <Button className="accountButton alt" onClick={() => {setScreen('create')}}>create new account</Button>
+                <Button className="accountButton alt">import account</Button>
+                <Button className="accountButton alt">switch account/network</Button>
+                <Button className="accountButton alt" onClick={() => showMnemonic()}>show mnemonic</Button>
             </div>
-        </div>
-        <CopyToClipboard text={address}>
-        <p id="blinkAddress" onClick={blink} style={{wordBreak:'break-all', width:'80%', fontSize:'12px', textAlign:'center', color:'black'}}>
-            {address}
-            <img alt='' onClick={blink} style={{width:'30px', marginLeft:'5px', cursor:'pointer'}} src={copyIcon}/>
-        </p>
-        </CopyToClipboard>
-        </div>
-        <br/>
+            </div>
+            :
+            <div style={{display:'flex', flexDirection:'row', justifyContent:'right'}}>
+                <Button className="accountButton alt" style={{width:'20vw'}} onClick={() => {setScreen('')}}>back</Button>
+            </div>
+            }
+
+            {screen==='create'?
+            <div style={{marginTop:'3vw', width:'70vw'}}>
+            <TextField fullWidth onChange={(e)=>{nameRef.current=e.target.value}} label="account name" size='small' style={{margin:'1vw 0'}} multiline/>
+            <Button className="accountButton alt" onClick={async () => {await createAccount(nameRef.current); setScreen('create');}}>create account</Button>
+            </div>
+            :
+            null}
         </div>
     );
 }

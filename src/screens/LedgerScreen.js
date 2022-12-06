@@ -1,16 +1,19 @@
 import { useEffect, useState } from "react";
 import { Vortex } from 'react-loader-spinner';
 import {useSessionCxt} from '../ChainFuncs.js';
+import {useUiCxt} from '../UiFuncs.js';
 import searchIcon from '../imgs/search.svg';
 
 
 export default function LedgerScreen() {
-    const {txns,chain,account,testnetUI,getTransactions} = useSessionCxt();
+    const {txns,chain,account,testnetUI} = useSessionCxt();
+    const {setBubbleHeight} = useUiCxt();
     const [txnsList, setTxnsList] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         async function loadTxns(){
+        setBubbleHeight(350);
         setLoading(true);
         if(!txns){
             return;
