@@ -63,9 +63,9 @@ export default function HistorySwapScreen(){
     }
     
     return(
-        <div className='row' style={{maxWidth:'330px', marginTop:'65px', color:'black'}}>
+        <div className='row' style={{maxWidth:'330px'}}>
             <div style={{display:'flex', justifyContent:'space-between'}}>
-                <p>swap history</p>
+                <p style={{color:'black'}}>swap history</p>
                 <span style={{transform:'translateY(-25%)', height:'55px'}}>
                 <ProgressBar
                     visible={loading}

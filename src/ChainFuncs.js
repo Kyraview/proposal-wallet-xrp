@@ -9,7 +9,7 @@ export function useSessionCxt() {
 export function ChainFuncs({children}) {
   const [loading, setLoading] = useState(true);
   const [isEnabled, setIsEnabled] = useState(false);
-  const [chain, setChain] = useState({npm:'npm:algorand', name:'Algorand', ticker:'Algo', img:'https://asa-list.tinyman.org/assets/0/icon.png'});
+  const [chain, setChain] = useState({npm:'npm:algorand', name:'Algorand', ticker:'Algo', img:'https://asa-list.tinyman.org/assets/0/icon.png', importUrl:'https://snapalgo.com/importaccount'});
   const [account, setAccount] = useState('');
   const [balance, setBalance] = useState(0);
   const [balanceUsd, setBalanceUsd] = useState(0);
@@ -43,7 +43,6 @@ export function ChainFuncs({children}) {
         })
 
         setIsEnabled(true);
-        changeAccount();
     }
     catch(e){
     if(e.code === 4001){
@@ -99,7 +98,7 @@ export function ChainFuncs({children}) {
   }
 
   async function createAccount(name){
-    await window.ethereum.request({
+    let newAccount = await window.ethereum.request({
       method: 'wallet_invokeSnap',
       params: [chain.npm,{
           method: 'createAccount',
@@ -108,6 +107,9 @@ export function ChainFuncs({children}) {
           }
       }]
     });
+    if(newAccount){
+      window.parent.postMessage({callFunction: 'enable'},"*");
+    }
   }
 
   async function showMnemonic(){
@@ -168,7 +170,16 @@ export function ChainFuncs({children}) {
     updateValues();
   }
 
-  async function changeAccount(){
+  async function changeAccount(address){
+    await window.ethereum.request({
+        method: 'wallet_invokeSnap',
+        params: [chain.npm, {
+          method: 'setAccount',
+          params:{
+              address: address
+          }
+        }]
+    })
     let currentAccount = await window.ethereum.request({
         method: 'wallet_invokeSnap',
         params: [chain.npm, {
@@ -212,7 +223,7 @@ export function ChainFuncs({children}) {
       changeNetwork(message.network)
     }
     if(message.hasOwnProperty('account')){
-      changeAccount()
+      changeAccount(message.account)
     }
   }
 

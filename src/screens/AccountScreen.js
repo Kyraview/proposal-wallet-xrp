@@ -5,7 +5,7 @@ import {useUiCxt} from '../UiFuncs.js';
 import Button from 'react-bootstrap/Button';
 
 export default function AccountScreen() {
-    const {createAccount, showMnemonic} = useSessionCxt();
+    const {createAccount, showMnemonic, chain} = useSessionCxt();
     const {setBubbleHeight} = useUiCxt();
     const [screen, setScreen] = useState('');
     const nameRef = useRef();
@@ -20,8 +20,8 @@ export default function AccountScreen() {
             <div style={{display:'flex', flexDirection:'row', justifyContent:'center'}}>
             <div style={{display:'flex', flexDirection:'column', marginTop:'3vw'}}>
                 <Button className="accountButton alt" onClick={() => {setScreen('create')}}>create new account</Button>
-                <Button className="accountButton alt">import account</Button>
-                <Button className="accountButton alt">switch account/network</Button>
+                <a href={chain.importUrl} target="_blank" rel="noopener noreferrer"><Button className="accountButton alt">import account</Button></a>
+                <Button className="accountButton alt" onClick={() => {window.parent.postMessage({callFunction: 'enable'},"*");}}>switch account/network</Button>
                 <Button className="accountButton alt" onClick={() => showMnemonic()}>show mnemonic</Button>
             </div>
             </div>

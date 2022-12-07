@@ -18,7 +18,7 @@ export default function BaseScreen(){
     }
 
     return(
-            <div>
+            <div className='box'>
                 
                 {isEnabled?
                 <div style={{display:'flex', flexDirection:'row', justifyContent:'right', margin:'2vh 5vw', height:'12vh'}}>
@@ -32,7 +32,7 @@ export default function BaseScreen(){
                 </div>}
 
                 {isEnabled?
-                <div style={{display:'flex', flexDirection:'row', justifyContent:'center', height:'72vh', overflow:'auto'}}>
+                <div className='cardBody' style={{display:'flex', flexDirection:'row', justifyContent:'center', overflow:'auto'}}>
                 {screen==='base'?
                 <AssetScreen />
                 :
@@ -54,7 +54,7 @@ export default function BaseScreen(){
                 null}
 
                 {isEnabled?
-                <div style={{display:'flex', flexDirection:'column', justifyContent:'center', width:'100vw', height:'12vh', background:'black'}}>
+                <div style={{display:'flex', flexDirection:'column', justifyContent:'center', width:'100vw', height:'45px', background:'black'}}>
                 <div style={{display:'flex', flexDirection:'row', justifyContent:'center'}}>
                     <img onClick={()=>{setScreen('base')}} className='menuIcon' src={assetIcon} alt='' />
                     <img onClick={()=>{setScreen('ledger')}} className='menuIcon' src={ledgerIcon} alt='' />

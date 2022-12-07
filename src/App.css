@@ -81,6 +81,7 @@
 .iconButtonDefault{
   width:10vw;
   filter: invert(100%);
+  cursor: pointer;
 }
 
 .assetTextDefault{
@@ -92,5 +93,16 @@
 .menuIcon{
   width:6vw;
   height:6vw;
-  margin: 0 1vw;
+  margin: 2px 5px;
+  cursor: pointer;
+}
+
+.box {
+  display: flex;
+  flex-flow: column;
+  height: 100vh;
+}
+
+.cardBody {
+  flex-grow: 1;
 }
