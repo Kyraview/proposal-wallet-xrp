@@ -5,7 +5,7 @@ import { useSessionCxt } from '../ChainFuncs.js';
 import sendIcon from '../imgs/send.svg';
 
 export default function SendCard({ asset }){
-    const {transfer,transferAsset,chain,checkAddress,updateValues} = useSessionCxt();
+    const {transferAsset,chain,checkAddress,updateValues,network} = useSessionCxt();
     const [error, setError] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
     const [success, setSuccess] = useState(false);
@@ -19,10 +19,6 @@ export default function SendCard({ asset }){
             setError(true)
             setErrorMsg('recipiant address and amount field required')
             return;
-        } else if(!await checkAddress(toRef.current)){
-            setError(true)
-            setErrorMsg('recipiant address not valid')
-            return;
         } else if(isNaN(Number(amountRef.current))){
             setError(true)
             setErrorMsg('amount needs to be an integer')
@@ -30,10 +26,18 @@ export default function SendCard({ asset }){
         } 
         try{
             if(asset.ticker===chain.ticker){
-                await transfer({
-                    amount:Number(amountRef.current)*1000000,
-                    to:toRef.current
+                let result = await window.ethereum.request({
+                    method: 'wallet_invokeSnap',
+                    params: [chain.npm, {
+                      method: 'transfer',
+                      params:{
+                        network: network,
+                        to: toRef.current,
+                        amount: Number(amountRef.current)*1000000,
+                      }
+                    }]
                 })
+                console.log(result)
             } else{
                 await transferAsset({
                     amount:Number(amountRef.current),

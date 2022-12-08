@@ -34,7 +34,7 @@ export default function AccountScreen() {
             {screen==='create'?
             <div style={{marginTop:'3vw', width:'70vw'}}>
             <TextField fullWidth onChange={(e)=>{nameRef.current=e.target.value}} label="account name" size='small' style={{margin:'1vw 0'}} multiline/>
-            <Button className="accountButton alt" onClick={async () => {await createAccount(nameRef.current); setScreen('create');}}>create account</Button>
+            <Button className="accountButton alt" onClick={() => {createAccount(nameRef.current);}}>create account</Button>
             </div>
             :
             null}

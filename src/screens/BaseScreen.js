@@ -11,7 +11,7 @@ import swapIcon from '../imgs/AlgoIconExchange.svg';
 
 export default function BaseScreen(){
     const [screen, setScreen] = useState('base');
-    const {enable, isEnabled, account, testnetUI} = useSessionCxt();
+    const {enable, isEnabled, account, network} = useSessionCxt();
 
     const unlock = async () => {
         enable();
@@ -22,7 +22,7 @@ export default function BaseScreen(){
                 
                 {isEnabled?
                 <div style={{display:'flex', flexDirection:'row', justifyContent:'right', margin:'2vh 5vw', height:'12vh'}}>
-                    <h1 style={{fontSize:'4vw'}}>{account.name} - {testnetUI?'testnet':'mainnet'}</h1>
+                    <h1 style={{fontSize:'3.5vw'}}>{account.name} - {network}</h1>
                 </div>
                 :
                 <div style={{display:'flex', flexDirection:'column', justifyContent:'center', height:'100vh'}}>
@@ -41,7 +41,7 @@ export default function BaseScreen(){
                 <LedgerScreen />
                 :
                 null}
-                {screen==='swap' && !testnetUI?
+                {screen==='swap' && network==='mainnet'?
                 <SwapScreen />
                 :
                 null}
@@ -58,7 +58,7 @@ export default function BaseScreen(){
                 <div style={{display:'flex', flexDirection:'row', justifyContent:'center'}}>
                     <img onClick={()=>{setScreen('base')}} className='menuIcon' src={assetIcon} alt='' />
                     <img onClick={()=>{setScreen('ledger')}} className='menuIcon' src={ledgerIcon} alt='' />
-                    {!testnetUI?<img onClick={()=>{setScreen('swap')}} className='menuIcon' src={swapIcon} alt='' />:null}
+                    {network==='mainnet'?<img onClick={()=>{setScreen('swap')}} className='menuIcon' src={swapIcon} alt='' />:null}
                     <img onClick={()=>{setScreen('account')}} className='menuIcon' src={accountIcon} alt='' />
                 </div>
                 </div>

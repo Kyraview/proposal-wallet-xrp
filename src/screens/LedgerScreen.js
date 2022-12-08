@@ -15,6 +15,7 @@ export default function LedgerScreen() {
         async function loadTxns(){
         setBubbleHeight(350);
         setLoading(true);
+        setLoading(false);
         if(!txns){
             return;
         }

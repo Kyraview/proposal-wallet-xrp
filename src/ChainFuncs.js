@@ -1,4 +1,5 @@
 import React, {useContext,useState,useEffect,useRef} from 'react';
+import chainImg from './imgs/xrpLogo.png';
 
 const SessionCxt = React.createContext();
 
@@ -9,24 +10,17 @@ export function useSessionCxt() {
 export function ChainFuncs({children}) {
   const [loading, setLoading] = useState(true);
   const [isEnabled, setIsEnabled] = useState(false);
-  const [chain, setChain] = useState({npm:'npm:algorand', name:'Algorand', ticker:'Algo', img:'https://asa-list.tinyman.org/assets/0/icon.png', importUrl:'https://snapalgo.com/importaccount'});
-  const [account, setAccount] = useState('');
+  const [chain, setChain] = useState({npm:'npm:snapxrpl', name:'Ripple', ticker:'XRP', img:chainImg, importUrl:'https://snapalgo.com/importaccount'});
+  const [account, setAccount] = useState({});
   const [balance, setBalance] = useState(0);
   const [balanceUsd, setBalanceUsd] = useState(0);
   const [assets, setAssets] = useState();
   const [txns, setTxns] = useState();
-  const [testnetUI, setTestnetUI] = useState();
-  const testnet = useRef();
+  const [network, setNetwork] = useState();
 
   const networkList = {
-    'testnet-v1.0':true,
-    'mainnet-v1.0':false
-  }
-
-  async function updateValues(){
-    getAssets();
-    getTransactions();
-    updateBalance();
+    'testnet-v1.0':'testnet',
+    'mainnet-v1.0':'mainnet'
   }
 
   async function enable(){
@@ -35,129 +29,59 @@ export function ChainFuncs({children}) {
     );
 
     try{
-        await window.ethereum.request({
-          method: 'wallet_enable',
-          params: [{
-            wallet_snap: { [chain.npm]: {} },
-          }]
-        })
-
-        setIsEnabled(true);
+      const thing = await window.ethereum.request({
+        method: 'wallet_enable',
+        params: [{
+          wallet_snap: { [chain.npm]: {} },
+        }]
+      })
+      setIsEnabled(true);
     }
     catch(e){
-    if(e.code === 4001){
+      if(e.code === 4001){
         console.log("rejected");
         return;
-    }
-    else{
+      }
+      else{
         alert("you must install metamask flask to use this libary")
         throw(e);
-    }
-    }
-  }
-
-  async function transfer(txn){
-    try {
-    let result = await window.ethereum.request({
-      method: 'wallet_invokeSnap',
-      params: [chain.npm,{
-          method: 'transfer',
-          params:{
-              amount: txn.amount,
-              testnet: testnet.current,
-              to: txn.to
-          }
-      }]
-    });
-    return result
-    } catch (err) {
-      return{ error:true,
-              msg:'transaction failed'}
+      }
     }
   }
 
   async function transferAsset(txn){
-    try {
-    let result = await window.ethereum.request({
-      method: 'wallet_invokeSnap',
-      params: [chain.npm,{
-          method: 'transferAsset',
-          params:{
-              amount: txn.amount,
-              assetIndex: txn.assetIndex,
-              testnet: testnet.current,
-              to: txn.to
-          }
-      }]
-    });
-    return result
-    } catch (err) {
-      return{ error:true,
-              msg:'transaction failed'}
-    }
+    return true;
   }
 
   async function createAccount(name){
     let newAccount = await window.ethereum.request({
       method: 'wallet_invokeSnap',
-      params: [chain.npm,{
-          method: 'createAccount',
-          params:{
-              name: name
-          }
+      params: [chain.npm, {
+        method: 'createAccount',
+        params:{
+            name: name
+        }
       }]
-    });
+    })
     if(newAccount){
       window.parent.postMessage({callFunction: 'enable'},"*");
     }
   }
 
   async function showMnemonic(){
-    await window.ethereum.request({
-      method: 'wallet_invokeSnap',
-      params: [chain.npm,{
-          method: 'displayMnemonic'
-      }]
-    });
+    return true;
   }
 
   async function checkAddress(address){
-    let result = await window.ethereum.request({
-      method: 'wallet_invokeSnap',
-      params: [chain.npm,{
-          method: 'isValidAddress',
-          params:{
-              address: address
-          }
-      }]
-    });
-    return result
+    return true;
   }
 
   async function getAssets(){
-    let loadedAssets = await window.ethereum.request({
-      method: 'wallet_invokeSnap',
-      params: [chain.npm,{
-          method: 'getAssets',
-          params:{
-              testnet: testnet.current
-          }
-      }]
-    });
-    setAssets(loadedAssets);
+    setAssets({});
   }
 
   async function getTransactions(){
-    let loadedTxns = await window.ethereum.request({
-      method: 'wallet_invokeSnap',
-      params: [chain.npm, {
-        method: 'getTransactions',
-        params:{
-            testnet: testnet.current
-        }
-      }]
-    })
-    setTxns(loadedTxns.transactions);
+    setTxns(null);
   }
 
   function selectChain(newChain){
@@ -165,57 +89,40 @@ export function ChainFuncs({children}) {
   }
 
   function changeNetwork(newNetwork){
-    testnet.current = networkList[newNetwork.genesisId]
-    setTestnetUI(networkList[newNetwork.genesisId])
-    updateValues();
+    setNetwork(networkList[newNetwork.genesisId])
   }
 
-  async function changeAccount(address){
-    await window.ethereum.request({
-        method: 'wallet_invokeSnap',
-        params: [chain.npm, {
-          method: 'setAccount',
-          params:{
-              address: address
-          }
-        }]
-    })
-    let currentAccount = await window.ethereum.request({
-        method: 'wallet_invokeSnap',
-        params: [chain.npm, {
-          method: 'getCurrentAccount'
-        }]
-    })
-    setAccount(currentAccount)
+  async function changeAccount(account){
+    setAccount({name:account, addr:account})
   }
 
   async function updateBalance(){
-    let usdPrice = fetch("https://api.coincap.io/v2/assets/algorand" ,{
-        method: 'GET',
-        redirect: 'follow'
-        })
-    .then((res)=>res.text())
-    .then((text)=>{
-        usdPrice = Number(JSON.parse(text).data.priceUsd)
+    try{
+    let usdPrice = 2;
+    let newbalance = await window.ethereum.request({
+      method: 'wallet_invokeSnap',
+      params: [chain.npm, {
+        method: 'getBalance',
+        params:{
+          network: network
+        }
+      }]
     })
-    .catch((error)=>{
-        console.log(error);
-        usdPrice = 0;
-    });
-
-    let balance = await window.ethereum.request({
-        method: 'wallet_invokeSnap',
-        params: [chain.npm, {
-          method: 'getBalance',
-          params:{
-              testnet: testnet.current
-          }
-        }]
-    })
-    balance = balance/1000000;
-    let usdBalance = balance * usdPrice;
-    setBalance(balance.toFixed(3))
+    newbalance /= 1000000
+    console.log(newbalance)
+    let usdBalance = newbalance * usdPrice;
+    setBalance(newbalance.toFixed(3))
     setBalanceUsd(usdBalance.toFixed(2))
+    } catch {
+      setBalance(0)
+      setBalanceUsd(0)
+    }
+  }
+
+  const updateValues = async () => {
+    getAssets();
+    getTransactions();
+    updateBalance();
   }
 
   function handlePostMessage(message) {
@@ -239,10 +146,9 @@ export function ChainFuncs({children}) {
     getAssets,
     getTransactions,
     isEnabled,
+    network,
     selectChain,
     showMnemonic,
-    testnetUI,
-    transfer,
     transferAsset,
     txns,
     updateValues
@@ -252,6 +158,10 @@ export function ChainFuncs({children}) {
     window.addEventListener('message', (event) => { handlePostMessage(event.data) });
     setLoading(false);
   }, []);
+
+  useEffect(() => {
+    updateValues()
+  }, [network, account]);
 
   return (
     <SessionCxt.Provider value={value}>

@@ -5,21 +5,19 @@ import Alert from 'react-bootstrap/Alert';
 import Select from 'react-select';
 import swapSideIcon from './imgs/swapSide.png';
 import downArrow from './imgs/downArrow.png';
-import algoLogo from './imgs/algoLogo.png';
+import chainLogo from './imgs/xrpLogo.png';
 import ethLogo from './imgs/ethLogo.png';
 import bnbLogo from './imgs/bnbLogo.png';
 import './bggradient.css';
 import { Vortex } from 'react-loader-spinner';
-import Utils  from './Utils.js';
-
-
-const options = [
-    { value: 'ALGO', label: <div><img src={algoLogo} height="30px" style={{paddingRight: '5px'}} alt=''/>ALGO </div> },
-    { value: 'ETH', label: <div><img src={ethLogo} height="30px" style={{paddingRight: '5px'}} alt=''/>ETH </div> },
-    { value: 'BSC', label: <div><img src={bnbLogo} height="30px" style={{paddingRight: '5px'}} alt=''/>BSC </div> }
-];
 
 export default function MainSwapScreen(){
+    const {chain} = useSessionCxt();
+    const options = [
+        { value: chain.ticker, label: <div><img src={chainLogo} height="30px" style={{paddingRight: '5px'}} alt=''/>{chain.ticker} </div> },
+        { value: 'ETH', label: <div><img src={ethLogo} height="30px" style={{paddingRight: '5px'}} alt=''/>ETH </div> },
+        { value: 'BSC', label: <div><img src={bnbLogo} height="30px" style={{paddingRight: '5px'}} alt=''/>BSC </div> }
+    ];
     const [error, setError] = useState(false);
     const [errorMsg, setErrorMsg] = useState("Swap failed");
     const [swapSuccess, setSwapSuccess] = useState(false)
@@ -34,7 +32,6 @@ export default function MainSwapScreen(){
     const [min, setMin] = useState(null);
     const [warning, setWarning] = useState(false);
     const [spendable, setSpendable] = useState(null);
-    const {chain} = useSessionCxt();
 
     useEffect(() => {
         initialLoad();
@@ -42,10 +39,8 @@ export default function MainSwapScreen(){
 
     const initialLoad = async() =>{
         setLoading(true);
-        await getMin(fromValue.value, toValue.value);
-        const algoBalance = await Utils.getBalance('algo', chain);
-        setSpendable(algoBalance);
-        console.log('rendered')
+        setMin(5.501);
+        setSpendable(50);
         setLoading(false);
     }
 
@@ -53,27 +48,15 @@ export default function MainSwapScreen(){
         updateInputs(inputAmount,fromValue.value,toValue.value);
     }, [inputAmount, fromValue, toValue])
 
-    const getMin = async (fromTicker, toTicker)=>{
-        const min = await Utils.getMin(fromTicker, toTicker, chain);
-        if(min.failure){
-            setWarningText(min.error);
-            setWarning(true);
-            setMin(0);
-        }
-        setMin(min.minAmount);
-    }
-
     const setMax = () =>{
         setInputAmount(spendable);
     }
 
     const handleFromChange = async (selectedOption) => {
-        getMin(selectedOption.value, toValue.value);
         setFrom(selectedOption);
     }
 
     const handleToChange = async (selectedOption) => {
-        getMin(fromValue.value, selectedOption.value);
         setTo(selectedOption);
     }
 
@@ -94,20 +77,6 @@ export default function MainSwapScreen(){
 
     const swapToken = async () => {
         try{
-        const output = await window.ethereum.request({
-            method: 'wallet_invokeSnap',
-            params: [chain.npm, 
-            {
-                method: 'swap',
-                params:{
-                    from: fromValue.value,
-                    to: toValue.value,
-                    amount: inputAmount
-                }
-            }
-            ]
-        });
-        console.log(output);
         setSwapSuccess(true);
         } catch(e){
         console.log(e);
@@ -121,31 +90,6 @@ export default function MainSwapScreen(){
             return true;
         }
         setLoading(true);
-        const result = await window.ethereum.request({
-            method: 'wallet_invokeSnap',
-            params: [chain.npm, 
-            {
-                method: 'preSwap',
-                params:{
-                    from: fromTicker,
-                    to: toTicker,
-                    amount: inputAmount
-                }
-            }
-            ]
-        });
-        console.log("preswap result is");
-        console.log(result);
-        if(result.failure){
-            setWarningText(<>{result.error}</>);
-            setWarning(true);
-            setLoading(false);
-            return;
-        } else{
-            setWarning(false);
-        }
-        setOutputAmount(result.estimatedAmount);
-        console.log(result);
         setLoading(false);
     }
 
@@ -162,7 +106,7 @@ export default function MainSwapScreen(){
                 <div className="row" style={{marginTop:'10px'}}>
                     <div>
                         <p style={{margin:'0', textAlign:'right', display:'block'}}>
-                            <span style={{backgroundColor:'black', padding:'5px', paddingLeft:"10px", borderRadius: '8px 8px 0% 0%'}}>Balance: {spendable} {fromValue.value}</span>
+                            <span style={{backgroundColor:'black', padding:'5px', paddingLeft:"10px", borderRadius: '8px 8px 0% 0%'}}>Balance: {spendable} {chain.ticker}</span>
                         </p>
                         <div style={{backgroundColor:'black', borderRadius: '8px 0px 8px 8px'}}>
                             <div style={{display: "flex", padding:'8px', }}> 

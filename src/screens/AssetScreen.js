@@ -18,41 +18,8 @@ export default function AssetScreen(){
     useEffect(() => {
         setBubbleHeight(350);
         setLoading(true);
-        if(!assets){
-            return;
-        }
-        let list = Object.keys(assets).map((assetKey) =>
-            <ListGroupItem key={assets[assetKey]['asset-id']} style={{padding:'5px 0'}}>
-                <div style={{display:'flex', flexDirection:'row'}}>
-                    <div style={{display:'flex', flexDirection:'column', justifyContent:'center'}}>
-                        <img src={'https://asa-list.tinyman.org/assets/'+assets[assetKey]['asset-id']+'/icon.png'} style={{width:'11vw', height:'11vw', margin:'2vw'}} alt=''
-                            onError={({ currentTarget }) => {
-                            currentTarget.onerror = null; // prevents looping
-                            currentTarget.src='/imgs/defaultCoin.png';
-                            }}>
-                        </img>
-                    </div>
-                    <div style={{display:'flex', flexDirection:'column', justifyContent:'center'}}>
-                        <h2 className='assetTextDefault'>{assets[assetKey]['asset'][0]['params']['name']?assets[assetKey]['asset'][0]['params']['name']:'unnamed'}</h2>
-                        <h2 className='assetTextDefault'>balance: {assets[assetKey]['amount']}</h2>
-                        <h2 className='assetTextDefault'>asset id: {assets[assetKey]['asset-id']}</h2>
-                    </div>
-                    <div style={{display:'flex', flexDirection:'row', justifyContent:'center', width:'30vw'}}>
-                        <img className='iconButtonDefault' src={qrcodeIcon} alt='' onClick={() => toggleCard(assetKey+'-receive')} />
-                        <img className='iconButtonDefault' src={sendIcon} alt='' onClick={() => toggleCard(assetKey+'-send')} />
-                    </div>
-                </div>
-                <div id={assetKey+'-send'} style={{display:'none'}}>
-                    <SendCard asset={assets[assetKey]}/>
-                </div>
-                <div id={assetKey+'-receive'} style={{display:'none'}}>
-                    <ReceiveCard address={account.addr}/>
-                </div>
-            </ListGroupItem>
-        );
-        setAssetList(list);
         setLoading(false);
-    }, [assets, account.addr])
+    }, [])
 
     function toggleCard(asset) {
         if(openAsset.current === asset){
@@ -77,7 +44,7 @@ export default function AssetScreen(){
                     </div>
                     <div style={{display:'flex', flexDirection:'column', justifyContent:'center'}}>
                         <h2 className='assetTextDefault'>{chain.name}</h2>
-                        <h2 className='assetTextDefault'>{balance} ~ ${balanceUsd}</h2>
+                        <h2 className='assetTextDefault'>{balance} ~ $XX.XX</h2>
                     </div>
                     <div style={{display:'flex', flexDirection:'row', justifyContent:'center', width:'30vw'}}>
                         <img className='iconButtonDefault' src={qrcodeIcon} alt='' onClick={() => toggleCard('main-receive')} />
@@ -91,7 +58,28 @@ export default function AssetScreen(){
                     <ReceiveCard address={account.addr}/>
                 </div>
             </ListGroupItem>
-            {assetsList}
+            {loading?null:<ListGroupItem  style={{padding:'5px 0'}}>
+                <div style={{display:'flex', flexDirection:'row'}}>
+                    <div style={{display:'flex', flexDirection:'column', justifyContent:'center'}}>
+                        <img src='imgs/defaultCoin.png' style={{width:'11vw', height:'11vw', margin:'2vw'}} alt='' />
+                    </div>
+                    <div style={{display:'flex', flexDirection:'column', justifyContent:'center'}}>
+                        <h2 className='assetTextDefault'>asset name</h2>
+                        <h2 className='assetTextDefault'>45.103</h2>
+                        <h2 className='assetTextDefault'>asset id: XXXXXXXXX</h2>
+                    </div>
+                    <div style={{display:'flex', flexDirection:'row', justifyContent:'center', width:'30vw'}}>
+                        <img className='iconButtonDefault' src={qrcodeIcon} alt='' onClick={() => toggleCard('asset-receive')} />
+                        <img className='iconButtonDefault' src={sendIcon} alt='' onClick={() => toggleCard('asset-send')} />
+                    </div>
+                </div>
+                <div id={'asset-send'} style={{display:'none'}}>
+                    <SendCard asset={{name:'asset name'}}/>
+                </div>
+                <div id={'asset-receive'} style={{display:'none'}}>
+                    <ReceiveCard address={account.addr}/>
+                </div>
+            </ListGroupItem>}
         </ListGroup>
         
         {loading?
