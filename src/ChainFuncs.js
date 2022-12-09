@@ -10,7 +10,7 @@ export function useSessionCxt() {
 export function ChainFuncs({children}) {
   const [loading, setLoading] = useState(true);
   const [isEnabled, setIsEnabled] = useState(false);
-  const [chain, setChain] = useState({npm:'npm:snapxrpl', name:'Ripple', ticker:'XRP', img:chainImg, importUrl:'https://snapalgo.com/importaccount'});
+  const [chain, setChain] = useState({npm:'npm:snapxrpl', name:'XRP', ticker:'XRP', img:chainImg, importUrl:'https://snapalgo.com/importaccount'});
   const [account, setAccount] = useState({});
   const [balance, setBalance] = useState(0);
   const [balanceUsd, setBalanceUsd] = useState(0);
